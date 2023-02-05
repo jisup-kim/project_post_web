@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+    <head>
+        <title>Log in</title>
+        <link href="{% static 'checklist/bootstrap/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+       
+
+    </head>
+    <body class="text-center">
+        <div class="container-fluid my-3">
+            <div class="row">
+            <div class="col-4">
+
+            </div>
+            <div class="col-4">
+            <h1>&nbsp</h1>
+            <hr/>
+            <h2>Please sign in</h2>
+            <hr/>
+            <form method="post" action="{% url 'loginout:login' %}">
+                {% csrf_token %}
+                {% include "loginout/form_errors.html" %}
+                <div class="mb-3">
+                    <label for="username">User ID</label>
+                    <input type="text" class="form-control" name="username" id="username" value="{{ form.username.value|default_if_none:'' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" value="{{ form.password.value|default_if_none:'' }}">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Sign in</button>
+                <p class="mt-5 mb-3 text-muted">© 2022–2023</p>
+            </form>
+            </div>
+            </div>
+        </div>
+    </body>
+
+</html>
