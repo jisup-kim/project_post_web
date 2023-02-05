@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+    <head>
+        <title>PDPS Log Record</title>
+        <link href="{% static 'checklist/bootstrap/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+       
+
+    </head>
+    <body>
+        {% include "work_upload/nav.html" %}
+
+          <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-2">
+                  {% include "work_upload/left_side.html" %}
+                </div>
+
+                <div class="col-10 mt-5">
+                  <div class="row">
+                      <div class="col-10">
+                        <h4>
+                          <div class="ml-2 mb-4">
+                            Lists
+                            {% if search_info %}<small class="text-muted">&nbsp;&nbsp;&nbsp;{{ search_info }}</small>{% endif %}
+                          </div>
+                        </h4>
+                      </div>
+                  
+                      <div class="ml-auto mr-4">
+                        {% if user.is_authenticated %}
+                          {% if user.is_superuser or user.is_staff %}
+                            <a href="/work_upload/create_work_upload/" class="btn btn-primary">Upload</a>
+                          {% endif %}
+                        {% endif %}
+                        
+                      </div>
+                  </div>
+
+
+                    <div class="temp-box" style="overflow:auto">
+
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Flight Name</th>
+                                <th scope="col">Flight Date</th>
+                                <th scope="col">Day</th>
+                                <th scope="col">Number</th>
+                                <th scope="col">WA</th>
+                                <th scope="col">TSPI</th>
+                                <th scope="col">Created Date</th>
+                                <th scope="col">Writer</th>
+                                {% if user.is_authenticated %}
+                                  {% if user.is_superuser or user.is_staff %}
+                                    <th scope="col">Delete</th>
+                                  {% endif %}
+                                {% endif %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for post in post_list %}
+                                
+                                <tr>
+                                  {% if user.is_authenticated %}
+                                    {% if user.is_superuser or user.is_staff %}
+                                      <td><a href="{{ post.get_absolute_url }}">{{ post.flight_name }}</a></td>
+                                    {% else %}
+                                      <td>{{ post.flight_name }}</td>
+                                    {% endif %}
+                                  {% endif %}
+                                    <td>{{ post.flight_date|date:"Y.m.d" }}</td>
+                                    <td>{{ post.flight_date|date:"l" }}</td>
+                                    <td>{{ post.flight_num }}</td>
+                                    <td>{{ post.inetx_ver}}_{{post.cal_ver}}</td>
+                                    <td>{{ post.tspi_ch }}</td>
+                                    <td>{{ post.created_at|date:"Y.m.d" }}</td>
+                                    <td>{{ post.writer_name }}</td>
+                                    <input id="posts_pks" type="hidden" value="{{ post.pk }}">
+                                    <!-- <td><a class="btn btn-outline-danger btn-sm" href="{{ post.get_absolute_url }}delete" role="button">Delete</a></td> -->
+                                    {% if user.is_authenticated %}
+                                      {% if user.is_superuser or user.is_staff %}
+                                        <td><a class="btn btn-outline-danger btn-sm" onclick="fn_del_post(posts_pks.value);" role="button">Delete</a></td>
+                                      {% endif %}
+                                    {% endif %}
+                                
+                                  </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    
+
+              </div>
+            </div>
+            <div class="container-fluid">
+              <div class="row">
+
+                
+                <div class="mb-4 ml-auto">
+                        <div class="container-fluid">
+                          <div class="input-group">
+                            <input class="form-control mr-1" type="text" placeholder="Search for..." id="search-input">
+                            <button class="btn btn-outline-success" type="button" onclick="searchPost();">Search</button>
+                          </div>
+                        </div>
+                </div>
+              </div>
+            </div>
+              <div class="ml-auto">
+                      <ul class="pagination justify-content-center mb-4">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&larr;</a>
+                        </li>
+                        {% else %}
+                          <li class="page-item disabled">
+                            <a class="page-link" href="#">&larr;</a>
+                          </li>
+                        {% endif %}
+                        
+                        {% for index in pagelist %}
+                          
+                          {% if index == page_obj.number %}
+                          <li class="page-item active">
+                            <span class="page-link">{{ index }}</span>
+                          </li>
+                          {% else %}
+                              {% if '…' in index %}
+                               <li class="page-item disabled">
+                                 <a class="page-link" href="?page={{ index }}">{{ index }}</a>
+                               </li>
+                              {% else %}
+                                <li class="page-item">
+                                  <a class="page-link" href="?page={{ index }}">{{ index }}</a>
+                                </li>
+                                {% endif %}
+
+
+                          {% endif %}
+                        {% endfor %}
+
+                          {% if page_obj.has_next %}
+                        <li class="page-item">
+                          <a class="page-link" href="?page={{ page_obj.next_page_number }}">&rarr;</a>
+                        </li>
+                        {% else %}
+                          <li class="page-item disabled">
+                            <a class="page-link" href="#">&rarr;</a>
+                          </li>
+                        {% endif %}
+                      </ul>
+              </div>
+            
+            
+          
+        </div>
+
+
+
+          <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+          <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+          <script>
+            function searchPost(){
+              let searchValue = document.getElementById('search-input').value.trim();
+              if (searchValue.length > 1){
+                location.href="/work_upload/search/" + searchValue + "/";
+              }
+              else{
+                alert('검색어('+ searchValue +')가 너무 짧습니다.');
+              }
+            };
+
+            document.getElementById('search-input').addEventListener('keyup', function(event)
+            {
+              if(event.key === 'Enter'){
+                searchPost();
+                }
+              });
+          </script>
+          <script>
+            function fn_del_post(a){
+            
+              var res = confirm('게시글을 정말로 삭제하시겠습니까?');
+              if(res){
+                
+                window.location.href = a + "/delete";
+                alert("성공적으로 삭제되었습니다.");
+              }
+            }
+          </script>
+          
+    </body>
+    {% include "work_upload/footer.html" %}
+</html>
